@@ -17,17 +17,17 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleW
            'Referer': 'http://diri.bg'
           }
 
-# TODO:      Completely scrape 2023 pre and post seasons
-# TODO:      Completely scrape 2022 pre, regular, and post seasons
-# TODO:      Completely scrape 2021 pre, regular, and post seasons
-# TODO:      Scrape all previous seasons' post-season (Will allow for querying how many times a team has made it to the playoffs/super bowl or won the super bowl.
-# TODO: DONE Fix formatting for dates to be in single quotes.
-# TODO: DONE Fix VALUE to VALUES
-# TODO: DONE Capitalize Regular, Pre, Post season values. 
-# TODO:      Handle duplicate player ID values (player traded mid-season?)
-# TODO:      Handle players with multiple positions (esp if both offense and defense, handle adding both offense_plays and defense_plays values
-# TODO: DONE Fix a few stadium names not matching between Stadiums and Teams
-# TODO:      Change _plays table names to _stats
+# TODO:             Completely scrape 2023 pre and post seasons
+# TODO:             Completely scrape 2022 pre, regular, and post seasons
+# TODO:             Completely scrape 2021 pre, regular, and post seasons
+# TODO:             Scrape all previous seasons' post-season (Will allow for querying how many times a team has made it to the playoffs/super bowl or won the super bowl.
+# TODO: DONE        Fix formatting for dates to be in single quotes.
+# TODO: DONE        Fix VALUE to VALUES
+# TODO: DONE        Capitalize Regular, Pre, Post season values. 
+# TODO: IN PROGRESS Handle duplicate player ID values (player traded mid-season?)
+# TODO:             Handle players with multiple positions (esp if both offense and defense, handle adding both offense_plays and defense_plays values
+# TODO: DONE        Fix a few stadium names not matching between Stadiums and Teams
+# TODO:             Change _plays table names to _stats
 
 # Get the URL's HTML. If HTTP reqeust fails, keep trying until it succeeds.
 def get_html(url):  
@@ -52,14 +52,15 @@ def get_html(url):
 # Create the DML header that removes old data
 def add_delete_from():
   with open('NFL_DML_Insert_file.sql', 'a') as dml_file:
-    dml_file.write(f'DELETE FROM {sql_cfg.st_game_stats}')
-    dml_file.write(f'DELETE FROM {sql_cfg.df_game_stats}')
-    dml_file.write(f'DELETE FROM {sql_cfg.of_game_stats}')
-    dml_file.write(f'DELETE FROM {sql_cfg.game_table}')
-    dml_file.write(f'DELETE FROM {sql_cfg.season_table}')
-    dml_file.write(f'DELETE FROM {sql_cfg.player_table}')
-    dml_file.write(f'DELETE FROM {sql_cfg.team_table}')
-    dml_file.write(f'DELETE FROM {sql_cfg.stadium_table}')
+    dml_file.write(f'DELETE FROM {sql_cfg.st_game_stats}\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.df_game_stats}\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.of_game_stats}\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.game_table}\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.season_table}\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.player_table}\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.team_table}\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.stadium_table}\n')
+    dml_file.write('\n')
 
 
 # Get the player data from the teams' rosters.
@@ -71,7 +72,7 @@ def get_player_data(teams):
     for team in teams:
       team_name = "'"+ team +"'"
 
-      for year in football.years:
+      for year in range(football.regular_season_range[0], football.regular_season_range[1]+1):
         # Get team roster page HTML
         print(f'Retrieving {team} roster.')
         url = webaddress.domain+'/teams/'+teams[team]['abbv']+'/'+str(year)+'_roster.htm'
@@ -144,7 +145,7 @@ def get_stats_data(players):
   with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
     
     for player in players:
-      for year in football.years:
+      for year in range(football.regular_season_range[0], football.regular_season_range[1]+1):
         print(f'Retrieving {player} gamelogs.')
         url = webaddress.domain+'/players/'+player[:1]+'/'+player+'/gamelog/'+str(year)
         
@@ -249,7 +250,7 @@ def get_stats_data(players):
 def get_game_data():
   with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
     
-    for year in football.years:
+    for year in range(football.regular_season_range[0], football.regular_season_range[1]+1):
       url = webaddress.domain+'/years/'+str(year)+'/games.htm'
 
       print(f'Retreiving {year} schedule.')
@@ -325,7 +326,7 @@ def get_team_data():
 
 def get_season_data():
     with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
-      for year in football.years:
+      for year in range(football.regular_season_range[0], football.regular_season_range[1]+1):
         season_type = "'Regular'"
         start_date = '2023-09-10'
         end_date = '2024-01-07'
