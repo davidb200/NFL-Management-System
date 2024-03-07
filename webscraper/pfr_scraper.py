@@ -27,6 +27,7 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleW
 # TODO:      Handle duplicate player ID values (player traded mid-season?)
 # TODO:      Handle players with multiple positions (esp if both offense and defense, handle adding both offense_plays and defense_plays values
 # TODO: DONE Fix a few stadium names not matching between Stadiums and Teams
+# TODO:      Change _plays table names to _stats
 
 # Get the URL's HTML. If HTTP reqeust fails, keep trying until it succeeds.
 def get_html(url):  
@@ -39,22 +40,33 @@ def get_html(url):
     
     try:
       html_doc = requests.get(url, headers = HEADERS)
-    
     except requests.exceptions.ConnectionError:
       print(f'   Attempt {attempt_count}: Failed to retrieve page. Retrying in 3 seconds.')
       sleep(3.1)
-    
     else:
       print(f'   Attempt {attempt_count}: HTTP request successful!')
   
   return html_doc
+
+
+# Create the DML header that removes old data
+def add_delete_from():
+  with open('NFL_DML_Insert_file.sql', 'a') as dml_file:
+    dml_file.write(f'DELETE FROM {sql_cfg.st_game_stats}')
+    dml_file.write(f'DELETE FROM {sql_cfg.df_game_stats}')
+    dml_file.write(f'DELETE FROM {sql_cfg.of_game_stats}')
+    dml_file.write(f'DELETE FROM {sql_cfg.game_table}')
+    dml_file.write(f'DELETE FROM {sql_cfg.season_table}')
+    dml_file.write(f'DELETE FROM {sql_cfg.player_table}')
+    dml_file.write(f'DELETE FROM {sql_cfg.team_table}')
+    dml_file.write(f'DELETE FROM {sql_cfg.stadium_table}')
+
 
 # Get the player data from the teams' rosters.
 def get_player_data(teams):
   player_ids = [] # List to fill and return for player gamelog URLs
   
   with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
-    dml_file.write(f'DELETE FROM {sql_cfg.player_table};\n')
 
     for team in teams:
       team_name = "'"+ team +"'"
@@ -82,38 +94,43 @@ def get_player_data(teams):
           jersey = 'NULL' if jersey is None or jersey.string is None else int(jersey.string)
           
           id = tr_tags[i].find('td', {'data-stat' : 'player'})['data-append-csv'] # Player ID is a tag attribute
-          player_ids.append(id)
-          id = "'" + id + "'"
           
-          name_td = tr_tags[i].find('td', {'data-stat' : 'player'})
-          name = name_td.find('a').string     # <td ...><a href...>name</a></td>
-          name = "'" + name.string.replace("'", "''") + "'"    # Sanitize '
+          if id in player_ids:
+            with open('duplicate_ids', 'a') as duplicate_id_file:
+              duplicate_id_file.write(id + ' ')
+          else:
+            player_ids.append(id)
+            id = "'" + id + "'"
 
-          age = tr_tags[i].find('td', {'data-stat' : "age"})
-          age = 'NULL' if age is None or age.string is None else int(age.string)
+            name_td = tr_tags[i].find('td', {'data-stat' : 'player'})
+            name = name_td.find('a').string     # <td ...><a href...>name</a></td>
+            name = "'" + name.string.replace("'", "''") + "'"    # Sanitize '
 
-          position = tr_tags[i].find('td', {'data-stat' : "pos"})
-          position = 'NULL' if position is None or position.string is None else "'" + position.string + "'"
+            age = tr_tags[i].find('td', {'data-stat' : "age"})
+            age = 'NULL' if age is None or age.string is None else int(age.string)
 
-          weight = tr_tags[i].find('td', {'data-stat' : 'weight'})
-          weight = 'NULL' if weight is None or weight.string is None else int(weight.string)
+            position = tr_tags[i].find('td', {'data-stat' : "pos"})
+            position = 'NULL' if position is None or position.string is None else "'" + position.string + "'"
 
-          height = tr_tags[i].find('td', {'data-stat' : 'height'})
-          height = 'NULL' if height is None or height.string is None else "'" + height.string + "'"
+            weight = tr_tags[i].find('td', {'data-stat' : 'weight'})
+            weight = 'NULL' if weight is None or weight.string is None else int(weight.string)
 
-          college = tr_tags[i].find('td', {'data-stat' : 'college_id'})
-          college = 'NULL' if college is None or college.string is None else college.string
-          college = "'" + college.replace("'", "''") + "'"
+            height = tr_tags[i].find('td', {'data-stat' : 'height'})
+            height = 'NULL' if height is None or height.string is None else "'" + height.string + "'"
 
-          try:
-            birth_date = "'"+ tr_tags[i].find('td', {'data-stat' : 'birth_date_mod'})['csk'] +"'" # YYYY-MM-DD format is a tag attribute
-          except KeyError:
-            birth_date = 'NULL'
+            college = tr_tags[i].find('td', {'data-stat' : 'college_id'})
+            college = 'NULL' if college is None or college.string is None else college.string
+            college = "'" + college.replace("'", "''") + "'"
 
-          years_played = tr_tags[i].find('td', {'data-stat' : 'experience'})
-          years_played = 0 if years_played.string == 'Rook' else years_played.string
-          
-          dml_file.write(f'INSERT INTO {sql_cfg.player_table} VALUES ({id}, {name}, {team_name}, {height}, {weight}, {age}, {position}, {jersey}, {birth_date}, {years_played}, {college});\n')
+            try:
+              birth_date = "'"+ tr_tags[i].find('td', {'data-stat' : 'birth_date_mod'})['csk'] +"'" # YYYY-MM-DD format is a tag attribute
+            except KeyError:
+              birth_date = 'NULL'
+
+            years_played = tr_tags[i].find('td', {'data-stat' : 'experience'})
+            years_played = 0 if years_played.string == 'Rook' else years_played.string
+
+            dml_file.write(f'INSERT INTO {sql_cfg.player_table} VALUES ({id}, {name}, {team_name}, {height}, {weight}, {age}, {position}, {jersey}, {birth_date}, {years_played}, {college});\n')
           
 
         sleep(3.2)
@@ -125,10 +142,6 @@ def get_player_data(teams):
 # Get the game data from a player's game log.
 def get_stats_data(players):
   with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
-
-    dml_file.write(f'DELETE FROM {sql_cfg.op_game_data};\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.dp_game_data};\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.sp_game_data};\n')
     
     for player in players:
       for year in football.years:
@@ -235,8 +248,6 @@ def get_stats_data(players):
 # Get the game data from the season's schedule page.
 def get_game_data():
   with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
-
-    dml_file.write(f'DELETE FROM {sql_cfg.game_table};\n')
     
     for year in football.years:
       url = webaddress.domain+'/years/'+str(year)+'/games.htm'
@@ -286,8 +297,6 @@ def get_game_data():
 def get_stadium_data():
   with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
     
-    dml_file.write(f'DELETE FROM {sql_cfg.stadium_table};\n')
-
     for stadium in nfl_stadiums:
       name = "'"+ stadium +"'"
       city = "'"+ nfl_stadiums[stadium]['city'] +"'"
@@ -302,8 +311,6 @@ def get_stadium_data():
 
 def get_team_data():
   with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
-  
-    dml_file.write(f'DELETE FROM {sql_cfg.team_table};\n')
 
     for team in nfl_teams:
       mascot = "'"+ team +"'"
@@ -318,7 +325,6 @@ def get_team_data():
 
 def get_season_data():
     with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
-      dml_file.write(f'DELETE FROM {sql_cfg.season_table};\n')
       for year in football.years:
         season_type = "'Regular'"
         start_date = '2023-09-10'
@@ -329,9 +335,11 @@ def get_season_data():
 
 
 if __name__ == '__main__':
-  '''
+
   f = open('NFL_DML_Insert_File.sql','w')   # Clear old file contents
   f.close()
+  
+  add_delete_from()
 
   get_stadium_data()
 
@@ -341,14 +349,15 @@ if __name__ == '__main__':
 
   with open('player_id.txt', 'w') as file:
     for id in player_ids:
-      file.write(id + " ")
+      file.write(id + ' ')
   
   get_season_data()
   
   get_game_data()
   
+  '''
   with open('player_id.txt', 'r') as file:
     player_ids = file.read().split()
-
-  get_plays_data(player_ids)
   '''
+  
+  get_stats_data(player_ids)
