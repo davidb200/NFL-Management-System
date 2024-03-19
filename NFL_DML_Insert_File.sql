@@ -2217,7 +2217,67 @@ INSERT INTO player VALUES ('WhitJa05', 'Jace Whittaker', 'Commanders', '5-11', 1
 INSERT INTO player VALUES ('WillJo07', 'Jonathan Williams', 'Commanders', '6-0', 217, 29, 'RB', 18, '1994-02-02', 7, 'Arkansas');
 INSERT INTO player VALUES ('WyliAn00', 'Andrew Wylie', 'Commanders', '6-6', 309, 29, 'OL', 71, '1994-08-19', 5, 'Eastern Michigan');
 
-INSERT INTO season VALUES (2023, 'Regular', 2023-09-10, 2024-01-07);
+-- Regular Seasons
+INSERT INTO season VALUES (2023, 'Regular', '2023-09-07', '2024-01-07');
+-- Post-Seasons
+INSERT INTO season VALUES (1966, 'Post', '1967-01-01', '1967-01-15');
+INSERT INTO season VALUES (1967, 'Post', '1967-12-23', '1968-01-14');
+INSERT INTO season VALUES (1968, 'Post', '1968-12-21', '1969-01-12');
+INSERT INTO season VALUES (1969, 'Post', '1969-12-27', '1970-01-11');
+INSERT INTO season VALUES (1970, 'Post', '1970-12-26', '1971-01-17');
+INSERT INTO season VALUES (1971, 'Post', '1971-12-25', '1972-01-16');
+INSERT INTO season VALUES (1972, 'Post', '1972-12-23', '1973-01-14');
+INSERT INTO season VALUES (1973, 'Post', '1973-12-22', '1974-01-13');
+INSERT INTO season VALUES (1974, 'Post', '1974-12-21', '1975-01-12');
+INSERT INTO season VALUES (1975, 'Post', '1975-12-27', '1976-01-18');
+INSERT INTO season VALUES (1976, 'Post', '1976-12-18', '1977-01-09');
+INSERT INTO season VALUES (1977, 'Post', '1977-12-24', '1978-01-15');
+INSERT INTO season VALUES (1978, 'Post', '1978-12-24', '1979-01-21');
+INSERT INTO season VALUES (1979, 'Post', '1979-12-23', '1980-01-20');
+INSERT INTO season VALUES (1980, 'Post', '1980-12-28', '1981-01-25');
+INSERT INTO season VALUES (1981, 'Post', '1981-12-27', '1982-01-24');
+INSERT INTO season VALUES (1982, 'Post', '1983-01-08', '1983-01-30');
+INSERT INTO season VALUES (1983, 'Post', '1983-12-24', '1984-01-22');
+INSERT INTO season VALUES (1984, 'Post', '1984-12-22', '1985-01-20');
+INSERT INTO season VALUES (1985, 'Post', '1985-12-28', '1986-01-26');
+INSERT INTO season VALUES (1986, 'Post', '1986-12-28', '1987-01-25');
+INSERT INTO season VALUES (1987, 'Post', '1988-01-03', '1988-01-31');
+INSERT INTO season VALUES (1988, 'Post', '1988-12-24', '1989-01-22');
+INSERT INTO season VALUES (1989, 'Post', '1989-12-31', '1990-01-28');
+INSERT INTO season VALUES (1990, 'Post', '1991-01-05', '1991-01-27');
+INSERT INTO season VALUES (1991, 'Post', '1991-12-28', '1992-01-26');
+INSERT INTO season VALUES (1992, 'Post', '1993-01-02', '1993-01-31');
+INSERT INTO season VALUES (1993, 'Post', '1994-01-08', '1994-01-30');
+INSERT INTO season VALUES (1994, 'Post', '1994-12-31', '1995-01-29');
+INSERT INTO season VALUES (1995, 'Post', '1995-12-30', '1996-01-28');
+INSERT INTO season VALUES (1996, 'Post', '1996-12-28', '1997-01-26');
+INSERT INTO season VALUES (1997, 'Post', '1997-12-27', '1998-01-25');
+INSERT INTO season VALUES (1998, 'Post', '1999-01-02', '1999-01-31');
+INSERT INTO season VALUES (1999, 'Post', '2000-01-08', '2000-01-30');
+INSERT INTO season VALUES (2000, 'Post', '2000-12-30', '2001-01-28');
+INSERT INTO season VALUES (2001, 'Post', '2002-01-12', '2002-02-03');
+INSERT INTO season VALUES (2002, 'Post', '2003-01-04', '2003-01-26');
+INSERT INTO season VALUES (2003, 'Post', '2004-01-03', '2004-02-01');
+INSERT INTO season VALUES (2004, 'Post', '2005-01-08', '2005-02-06');
+INSERT INTO season VALUES (2005, 'Post', '2006-01-07', '2006-02-05');
+INSERT INTO season VALUES (2006, 'Post', '2007-01-06', '2007-02-04');
+INSERT INTO season VALUES (2007, 'Post', '2008-01-05', '2008-02-03');
+INSERT INTO season VALUES (2008, 'Post', '2009-01-03', '2009-02-01');
+INSERT INTO season VALUES (2009, 'Post', '2010-01-09', '2010-02-07');
+INSERT INTO season VALUES (2010, 'Post', '2011-01-08', '2011-02-06');
+INSERT INTO season VALUES (2011, 'Post', '2012-01-07', '2012-02-05');
+INSERT INTO season VALUES (2012, 'Post', '2013-01-05', '2013-02-03');
+INSERT INTO season VALUES (2013, 'Post', '2014-01-04', '2014-02-02');
+INSERT INTO season VALUES (2014, 'Post', '2015-01-03', '2015-02-01');
+INSERT INTO season VALUES (2015, 'Post', '2016-01-09', '2016-02-07');
+INSERT INTO season VALUES (2016, 'Post', '2017-01-07', '2017-02-05');
+INSERT INTO season VALUES (2017, 'Post', '2018-01-06', '2018-02-04');
+INSERT INTO season VALUES (2018, 'Post', '2019-01-05', '2019-02-03');
+INSERT INTO season VALUES (2019, 'Post', '2020-01-04', '2020-02-02');
+INSERT INTO season VALUES (2020, 'Post', '2021-01-09', '2021-02-07');
+INSERT INTO season VALUES (2021, 'Post', '2022-01-15', '2022-02-13');
+INSERT INTO season VALUES (2022, 'Post', '2023-01-14', '2023-02-12');
+INSERT INTO season VALUES (2023, 'Post', '2024-01-13', '2024-02-11');
 
 -- Regular Season Games
 INSERT INTO game VALUES ('202309070kan', 2023, 'Regular', '1', '2023-09-07', 'Chiefs', 'Lions', 20, 21);
@@ -28111,4 +28171,12 @@ INSERT INTO offense_game_stats VALUES ('WyliAn00', '202311230dal', 0, 0, 0, 0, 0
 INSERT INTO offense_game_stats VALUES ('WyliAn00', '202312030was', 0, 0, 0, 0, 0, 0);
 INSERT INTO offense_game_stats VALUES ('WyliAn00', '202312170ram', 0, 0, 0, 0, 0, 0);
 INSERT INTO offense_game_stats VALUES ('WyliAn00', '202312240nyj', 0, 0, 0, 0, 0, 0);
+
+
+
+
+
+
+
+
 
