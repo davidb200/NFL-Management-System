@@ -4,9 +4,9 @@
 */
 
 /* If database tables need to be reset*/
-DROP TABLE special_teams_plays;
-DROP TABLE defense_plays;
-DROP TABLE offense_plays;
+DROP TABLE special_game_stats;
+DROP TABLE defense_game_stats;
+DROP TABLE offense_game_stats;
 DROP TABLE game;
 DROP TABLE season;
 DROP TABLE player;
@@ -69,7 +69,7 @@ create table player (
 create table season(
   year numeric(4, 0), 
   type varchar(7), 
-    CHECK (type IN ('Regular', 'Pre', 'Post')),
+    CHECK (type IN ('Regular', 'Post')),
   start_date date, 
   end_date date, 
   primary key(year, type)
@@ -85,7 +85,7 @@ create table game(
   game_id varchar(12),
   season_year numeric(4, 0), 
   season_type varchar(7),
-  week smallint,
+  week varchar(9),
   game_date date, 
   home_team varchar(50), 
   away_team varchar(50), 
@@ -96,13 +96,13 @@ create table game(
   foreign key(home_team) references team(mascot), 
   foreign key(away_team) references team(mascot)
 );
-/* Attrbiutes for offense_plays: player_id, game_id, passing_completions, passing_attempts,
+/* Attrbiutes for offense_game_stats: player_id, game_id, passing_completions, passing_attempts,
  * passing yards, rushing attempts, rushing yards,fumbles
  * Primary key -> player id and game id
  * Foreign key -> player_id references player's id,
  *                game_id references game's game_id
 */
-create table offense_plays(
+create table offense_game_stats(
   player_id varchar(8), 
   game_id varchar(12),
   passing_completions int, 
@@ -115,13 +115,13 @@ create table offense_plays(
   foreign key(player_id) references player(id),
   foreign key(game_id) references game(game_id)
 );
-/* Attributes for defense_plays: game_id, player_id, date_time,tackles,sacks,
+/* Attributes for defense_game_stats: player_id, game_id, tackles,sacks,
  * fumbles_recovered,interceptions,passes defended
  * Primary key -> game_id and player_id
  * Foreign key -> player_id references player's id,
  *				  game_id references game's game_id
 */
-create table defense_plays(
+create table defense_game_stats(
   player_id varchar(8),
   game_id varchar(12), 
   tackles int, 
@@ -133,12 +133,12 @@ create table defense_plays(
   foreign key(player_id) references player(id), 
   foreign key(game_id) references game(game_id)
 );
-/* Attrbiutes for special_teams_plays: game_id,player_id,date_time,field_goals,fg_attempts,
- * extra_points,ep_attempts,punts,punt yards
+/* Attrbiutes for special_game_stats: game_id, player_id, field_goals, fg_attempts,
+ * extra_points, ep_attempts, punts, punt yards
  * Primary key -> game_id and player_id
  * Foreign key -> game_id references game's game_id
 */
-create table special_teams_plays(
+create table special_game_stats(
   player_id varchar(8),
   game_id varchar(12),
   field_goals int, 
