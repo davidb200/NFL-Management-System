@@ -1,5 +1,4 @@
 # Seasons
-preseason_range = (2023, 2023)
 regular_season_range = (2023, 2023)
 postseason_range = (1967, 2023)     # Superbowl I in 1967
 
