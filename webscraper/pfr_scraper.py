@@ -10,16 +10,8 @@ import football_cfg as football
 import sql_cfg
 
 
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15', 
-           'Accept-language': 'bg', 
-           'Accept-encoding': 'identit', 
-           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
-           'Referer': 'http://diri.bg'
-          }
-
-# TODO:             Completely scrape 2023 pre and post seasons
-# TODO:             Completely scrape 2022 pre, regular, and post seasons
-# TODO:             Completely scrape 2021 pre, regular, and post seasons
+# TODO: DONE        Change regular season years scraping from a list to a range
+# TODO:             Add scraping for post-seasons (which will have different years from regular seasons)
 # TODO:             Scrape all previous seasons' post-season (Will allow for querying how many times a team has made it to the playoffs/super bowl or won the super bowl.
 # TODO: DONE        Fix formatting for dates to be in single quotes.
 # TODO: DONE        Fix VALUE to VALUES
@@ -27,7 +19,16 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleW
 # TODO: IN PROGRESS Handle duplicate player ID values (player traded mid-season?)
 # TODO:             Handle players with multiple positions (esp if both offense and defense, handle adding both offense_plays and defense_plays values
 # TODO: DONE        Fix a few stadium names not matching between Stadiums and Teams
-# TODO:             Change _plays table names to _stats
+# TODO: DONE        Change _plays table names to _stats
+
+
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15', 
+           'Accept-language': 'bg', 
+           'Accept-encoding': 'identit', 
+           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
+           'Referer': 'http://diri.bg'
+          }
+
 
 # Get the URL's HTML. If HTTP reqeust fails, keep trying until it succeeds.
 def get_html(url):  
@@ -52,14 +53,14 @@ def get_html(url):
 # Create the DML header that removes old data
 def add_delete_from():
   with open('NFL_DML_Insert_file.sql', 'a') as dml_file:
-    dml_file.write(f'DELETE FROM {sql_cfg.st_game_stats}\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.df_game_stats}\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.of_game_stats}\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.game_table}\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.season_table}\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.player_table}\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.team_table}\n')
-    dml_file.write(f'DELETE FROM {sql_cfg.stadium_table}\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.st_game_stats};\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.df_game_stats};\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.of_game_stats};\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.game_table};\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.season_table};\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.player_table};\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.team_table};\n')
+    dml_file.write(f'DELETE FROM {sql_cfg.stadium_table};\n')
     dml_file.write('\n')
 
 
@@ -97,7 +98,7 @@ def get_player_data(teams):
           id = tr_tags[i].find('td', {'data-stat' : 'player'})['data-append-csv'] # Player ID is a tag attribute
           
           if id in player_ids:
-            with open('duplicate_ids', 'a') as duplicate_id_file:
+            with open('duplicate_ids.txt', 'a') as duplicate_id_file:
               duplicate_id_file.write(id + ' ')
           else:
             player_ids.append(id)
@@ -155,11 +156,11 @@ def get_stats_data(players):
         player_position = re.search(r'(?<=Position</strong>: )(.*?)(?=[\n\r])', html_doc.text)
         player_position = 'NULL' if player_position == None else player_position.group(0)
         if player_position in football.offense_positions:
-          table = sql_cfg.op_game_data
+          table = sql_cfg.of_game_stats
         elif player_position in football.defense_positions:
-          table = sql_cfg.dp_game_data
+          table = sql_cfg.df_game_stats
         elif player_position in football.special_positions:
-          table = sql_cfg.sp_game_data
+          table = sql_cfg.st_game_stats
         elif player_position == 'NULL':
           table = 'NULL'
         else:
@@ -181,7 +182,7 @@ def get_stats_data(players):
               
               game_id = f"'{tr_tags[i].find('a').get('href')[11:23]}'"
 
-              if table == sql_cfg.op_game_data:
+              if table == sql_cfg.of_game_stats:
                 pass_cmp = tr_tags[i].find('td', {'data-stat' : 'pass_cmp'})
                 pass_cmp = 0 if pass_cmp is None or pass_cmp.string is None else int(pass_cmp.string)
 
@@ -202,7 +203,7 @@ def get_stats_data(players):
 
                 dml_file.write(f'INSERT INTO {table} VALUES ({player_id}, {game_id}, {pass_cmp}, {pass_att}, {pass_yds}, {rush_att}, {rush_yds}, {fumbles_lost});\n')
 
-              elif table == sql_cfg.dp_game_data:
+              elif table == sql_cfg.df_game_stats:
                 tackles = tr_tags[i].find('td', {'data-stat' : 'tackles_combined'})
                 tackles = 0 if tackles is None or tackles.string is None else int(tackles.string)
 
@@ -220,7 +221,7 @@ def get_stats_data(players):
 
                 dml_file.write(f"INSERT INTO {table} VALUES ({player_id}, {game_id}, {tackles}, {sacks}, {fumbles_rec}, {def_int}, {pass_defended});\n")
 
-              elif table == sql_cfg.sp_game_data:
+              elif table == sql_cfg.st_game_stats:
                 fg_made = tr_tags[i].find('td', {'data-stat' : 'fgm'})
                 fg_made = 0 if fg_made is None or fg_made.string is None else int(fg_made.string)
 
@@ -339,6 +340,8 @@ if __name__ == '__main__':
 
   f = open('NFL_DML_Insert_File.sql','w')   # Clear old file contents
   f.close()
+  f = open('duplicate_ids.txt','w')
+  f.close()
   
   add_delete_from()
 
@@ -348,9 +351,11 @@ if __name__ == '__main__':
 
   player_ids = get_player_data(nfl_teams)
 
+  '''
   with open('player_id.txt', 'w') as file:
     for id in player_ids:
       file.write(id + ' ')
+  '''
   
   get_season_data()
   
