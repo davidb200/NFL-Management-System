@@ -8,3 +8,8 @@ CabiJa00 : FB-LB
 AgneJa00 : WR-CB
 BellNi01 : OLB-FB
 ThomLo00 : TE-QB
+RicaPa00 : FB-DT
+CabiJa00 : FB-LB
+AgneJa00 : WR-CB
+BellNi01 : OLB-FB
+ThomLo00 : TE-QB
