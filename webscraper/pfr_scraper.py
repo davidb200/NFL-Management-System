@@ -377,25 +377,72 @@ def get_team_data():
     dml_file.write('\n')
 
 def get_season_data():
-    with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
-      for year in range(football.regular_season_range[0], football.regular_season_range[1]+1):
-        season_type = "'Regular'"
-        start_date = '2023-09-10'
-        end_date = '2024-01-07'
-        dml_file.write(f'INSERT INTO {sql_cfg.season_table} VALUES ({year}, {season_type}, {start_date}, {end_date});\n')
+  with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
+    dml_file.write("-- Regular Seasons\n")
+    for year in range(football.regular_season_range[0], football.regular_season_range[1]+1):
+      url = webaddress.domain+'/years/'+str(year)+'/games.htm'
+
+      print(f'Retreiving {year} regular season.')
+      html_doc = get_html(url)
       
-      dml_file.write('\n')
+      soup = BeautifulSoup(html_doc.text, 'html.parser')
+      schedule_div = soup.find('div', id='div_games')
+
+      tr_tags = schedule_div.find_all('tr')
+      tr_tags = tr_tags[1:]
+      
+      game_dates = []
+      for i in range(len(tr_tags)):
+        week = tr_tags[i].find('th', {'data-stat' : 'week_num'})
+        if week.string in football.regular_season_weeks:
+          game_dates.append("'" + tr_tags[i].find('td', {'data-stat' : 'game_date'}).string + "'")
+          
+      print(game_dates)
+      season_type = "'Regular'"
+      start_date = game_dates[0]
+      end_date = game_dates[-1]
+      
+      dml_file.write(f'INSERT INTO {sql_cfg.season_table} VALUES ({year}, {season_type}, {start_date}, {end_date});\n')
+      sleep(3.2)
+    
+    dml_file.write("-- Post-Seasons\n")
+    for year in range(football.postseason_range[0], football.postseason_range[1]+1):
+      url = webaddress.domain+'/years/'+str(year)+'/games.htm'
+
+      print(f'Retreiving {year} postseason.')
+      html_doc = get_html(url)
+      
+      soup = BeautifulSoup(html_doc.text, 'html.parser')
+      schedule_div = soup.find('div', id='div_games')
+
+      tr_tags = schedule_div.find_all('tr')
+      tr_tags = tr_tags[1:]
+      
+      game_dates = []
+      for i in range(len(tr_tags)):
+        week = tr_tags[i].find('th', {'data-stat' : 'week_num'})
+        if week.string in football.postseason_game_types:
+          game_dates.append("'" + tr_tags[i].find('td', {'data-stat' : 'game_date'}).string + "'")
+          
+      print(game_dates)
+      season_type = "'Post'"
+      start_date = game_dates[0]
+      end_date = game_dates[-1]
+      dml_file.write(f'INSERT INTO {sql_cfg.season_table} VALUES ({year}, {season_type}, {start_date}, {end_date});\n')  
+      sleep(3.2)
+      
+    dml_file.write('\n')
 
 
 if __name__ == '__main__':
-  clear_file('NFL_DML_Insert_File.sql')
-  clear_file('duplicate_ids.txt')
+  #clear_file('NFL_DML_Insert_File.sql')
+  #clear_file('duplicate_ids.txt')
 
-  add_delete_from()
+  #add_delete_from()
 
-  get_stadium_data()
-  get_team_data()
-  player_ids = get_player_data(nfl_teams)
+  #get_stadium_data()
+  #get_team_data()
+  #player_ids = get_player_data(nfl_teams)
 
   '''
   with open('player_id.txt', 'w') as file:
@@ -404,11 +451,11 @@ if __name__ == '__main__':
   '''
   
   get_season_data()
-  get_game_data()
+  #get_game_data()
   
   '''
   with open('player_id.txt', 'r') as file:
     player_ids = file.read().split()
   '''
   
-  get_stats_data(player_ids)
+  #get_stats_data(player_ids)
