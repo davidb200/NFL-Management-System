@@ -70,7 +70,10 @@ INSERT INTO team VALUES ('Seahawks', 'Seattle', 'Pete Carroll', 'Lumen Field', '
 INSERT INTO team VALUES ('Buccaneers', 'Tampa Bay', 'Bruce Arians', 'Raymond James Stadium', 'NFC South');
 INSERT INTO team VALUES ('Titans', 'Tennessee', 'Mike Vrabel', 'Nissan Stadium', 'AFC South');
 INSERT INTO team VALUES ('Commanders', 'Washington', 'Dan Quinn', 'FedEx Field', 'NFC East');
-
+INSERT INTO team VALUES ('Redskins', 'Washington', NULL, NULL, 'NFC East');
+INSERT INTO team VALUES ('Team', 'Washington', NULL, NULL, 'NFC East');
+INSERT INTO team VALUES ('Oilers', 'Houston', NULL, NULL, 'AFL East');
+	
 INSERT INTO player VALUES ('BaccAn00', 'Andre Baccellia', 'Cardinals', '5-10', 175, 26, 'WR', 82, '1997-01-07', 1, 'Washington');
 INSERT INTO player VALUES ('BakeBu00', 'Budda Baker', 'Cardinals', '5-10', 195, 27, 'S', 3, '1996-01-10', 6, 'Washington');
 INSERT INTO player VALUES ('BankEr00', 'Eric Banks', 'Cardinals', '6-5', 274, 25, 'DL', 96, '1998-01-30', 2, 'Texas-San Antonio');
@@ -28171,12 +28174,3 @@ INSERT INTO offense_game_stats VALUES ('WyliAn00', '202311230dal', 0, 0, 0, 0, 0
 INSERT INTO offense_game_stats VALUES ('WyliAn00', '202312030was', 0, 0, 0, 0, 0, 0);
 INSERT INTO offense_game_stats VALUES ('WyliAn00', '202312170ram', 0, 0, 0, 0, 0, 0);
 INSERT INTO offense_game_stats VALUES ('WyliAn00', '202312240nyj', 0, 0, 0, 0, 0, 0);
-
-
-
-
-
-
-
-
-
