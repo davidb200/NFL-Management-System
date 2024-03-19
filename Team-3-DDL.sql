@@ -1,6 +1,7 @@
 /* Team 3 - DDL for NFL Management System
  * Tables used for NFL Management System: stadium,team,player,season,
  * game,offense_game_stats,defense_game_stats,special_game_stats
+
 */
 
 /* If database tables need to be reset*/
