@@ -49,6 +49,10 @@ def get_html(url):
   
   return html_doc
 
+# Clear the file for a new scrape
+def clear_file(filename):
+  f = open(filename,'w')   # Clear old file contents
+  f.close()
 
 # Create the DML header that removes old data
 def add_delete_from():
@@ -134,7 +138,6 @@ def get_player_data(teams):
 
             dml_file.write(f'INSERT INTO {sql_cfg.player_table} VALUES ({id}, {name}, {team_name}, {height}, {weight}, {age}, {position}, {jersey}, {birth_date}, {years_played}, {college});\n')
           
-
         sleep(3.2)
 
     dml_file.write('\n')
@@ -251,10 +254,11 @@ def get_stats_data(players):
 def get_game_data():
   with open('NFL_DML_Insert_File.sql', 'a') as dml_file:
     
+    dml_file.write("-- Regular Season Games\n")
     for year in range(football.regular_season_range[0], football.regular_season_range[1]+1):
       url = webaddress.domain+'/years/'+str(year)+'/games.htm'
 
-      print(f'Retreiving {year} schedule.')
+      print(f'Retreiving {year} regular schedule.')
       html_doc = get_html(url)
       
       soup = BeautifulSoup(html_doc.text, 'html.parser')
@@ -265,7 +269,9 @@ def get_game_data():
       
       for i in range(len(tr_tags)):
         week = tr_tags[i].find('th', {'data-stat' : 'week_num'})
-        if week.string in football.weeks:
+        if week.string in football.regular_season_weeks:
+          
+          week_string = "'" + week.string + "'"
 
           id = f"'{tr_tags[i].find_all('a')[2].get('href')[11:23]}'"
 
@@ -286,12 +292,57 @@ def get_game_data():
           lose_score = int(lose_score.string)
 
           if at.string is None:    # Home team won
-            dml_file.write(f"INSERT INTO {sql_cfg.game_table} VALUES ({id}, 2023, 'Regular', {week.string}, {date}, {winner}, {loser}, {win_score}, {lose_score});\n")
+            dml_file.write(f"INSERT INTO {sql_cfg.game_table} VALUES ({id}, {year}, 'Regular', {week_string}, {date}, {winner}, {loser}, {win_score}, {lose_score});\n")
           else:     # Away team won
-            dml_file.write(f"INSERT INTO {sql_cfg.game_table} VALUES ({id}, 2023, 'Regular', {week.string}, {date}, {loser}, {winner}, {lose_score}, {win_score});\n")
+            dml_file.write(f"INSERT INTO {sql_cfg.game_table} VALUES ({id}, {year}, 'Regular', {week_string}, {date}, {loser}, {winner}, {lose_score}, {win_score});\n")
       
       sleep(3.2)
+      
+    dml_file.write("-- Post-Season Games\n")
+    for year in range(football.postseason_range[0], football.postseason_range[1]+1):
+      # Get HTML for that year's season schedule page
+      url = webaddress.domain+'/years/'+str(year)+'/games.htm'
+      print(f'Retreiving {year} post-season schedule.')
+      html_doc = get_html(url)
+      
+      # Get the div with the season games table
+      soup = BeautifulSoup(html_doc.text, 'html.parser')
+      schedule_div = soup.find('div', id='div_games')
 
+      # Make a list of the table's rows
+      tr_tags = schedule_div.find_all('tr')
+      tr_tags = tr_tags[1:]
+
+      for i in range(len(tr_tags)):
+        week = tr_tags[i].find('th', {'data-stat' : 'week_num'})
+        if week.string in football.postseason_game_types:
+          week_string = "'" + week.string + "'"
+          
+          id = f"'{tr_tags[i].find_all('a')[2].get('href')[11:23]}'"
+
+          date = "'" + tr_tags[i].find('td', {'data-stat' : 'game_date'}).string + "'"
+      
+          winner = tr_tags[i].find('td', {'data-stat' : 'winner'})
+          winner = "'" + winner.string.split(' ')[-1] + "'"
+
+          win_score = tr_tags[i].find('td', {'data-stat' : 'pts_win'})
+          win_score = int(win_score.string)
+
+          at = tr_tags[i].find('td', {'data-stat' : 'game_location'})
+        
+          loser = tr_tags[i].find('td', {'data-stat' : 'loser'})
+          loser = "'" + loser.string.split(' ')[-1] + "'"
+
+          lose_score = tr_tags[i].find('td', {'data-stat' : 'pts_lose'})
+          lose_score = int(lose_score.string)
+
+          if at.string is None:    # Home team won
+            dml_file.write(f"INSERT INTO {sql_cfg.game_table} VALUES ({id}, {year}, 'Post', {week_string}, {date}, {winner}, {loser}, {win_score}, {lose_score});\n")
+          else:     # Away team won
+            dml_file.write(f"INSERT INTO {sql_cfg.game_table} VALUES ({id}, {year}, 'Post', {week_string}, {date}, {loser}, {winner}, {lose_score}, {win_score});\n")
+      
+      sleep(3.2)
+    
     dml_file.write('\n')
     print()
 
@@ -337,18 +388,13 @@ def get_season_data():
 
 
 if __name__ == '__main__':
+  clear_file('NFL_DML_Insert_File.sql')
+  clear_file('duplicate_ids.txt')
 
-  f = open('NFL_DML_Insert_File.sql','w')   # Clear old file contents
-  f.close()
-  f = open('duplicate_ids.txt','w')
-  f.close()
-  
   add_delete_from()
 
   get_stadium_data()
-
   get_team_data()
-
   player_ids = get_player_data(nfl_teams)
 
   '''
@@ -358,7 +404,6 @@ if __name__ == '__main__':
   '''
   
   get_season_data()
-  
   get_game_data()
   
   '''
