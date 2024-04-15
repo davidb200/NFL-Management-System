@@ -8,5 +8,5 @@ implemented using tools like postgresSQL, Jupyter Notebook, and Python.
 # Tools used
 <img width = "450" img height = "275" alt="postgresimg" src = "https://tse2.mm.bing.net/th?id=OIP.5eAy58BXR6eyTD5BDjFbAwHaDZ&pid=Api&P=0&h=180">
 <img width = "450" img height = "275" alt="jupyternotebookimg" src = "https://tse3.mm.bing.net/th?id=OIP.BWugDHBz7qW9EOPZfSk7fgHaFx&pid=Api&P=0&h=180">
-<img width = "450" img height = "275" alt="Pythonimg" src = "https://tse4.mm.bing.net/th?id=OIP.9S6VtzL6bysprm6gao1uugHaEK&pid=Api&P=0&h=180"
+<img width = "450" img height = "275" alt="Pythonimg" src = "https://tse4.mm.bing.net/th?id=OIP.9S6VtzL6bysprm6gao1uugHaEK&pid=Api&P=0&h=180">
 
