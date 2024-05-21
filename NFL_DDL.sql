@@ -14,8 +14,8 @@ DROP TABLE player;
 DROP TABLE team;
 DROP TABLE stadium;
 
-/* Attributes for stadium: name,city,state,address,capacity,turf type 
- * Primary key -> name 
+/* Attributes for stadium: name,city,state,address,capacity,turf_type 
+ * Primary key -> city, state
  * Foreign Key -> none
 */
 create table stadium(
@@ -25,23 +25,26 @@ create table stadium(
   address varchar(50), 
   capacity int, 
   turf_type varchar(50), 
-  primary key(name)
+  primary key(city, state)
 );
-/* Attributes for team: mascot,location,coach,home,division,wins,losses
+/* Attributes for team: mascot,location,coach,home_city,home_state,division,wins,losses,
+					    standing
  * Primary key -> mascot
- * Foreign key -> home references stadium's name
+ * Foreign key -> home_city references stadium city,
+ 				  home_state references stadium state
 */
 create table team (
   mascot varchar(50), 
   location varchar(50), 
   coach varchar(50), 
-  home varchar(50),
+  home_city varchar(50),
+  home_state char(2),
   division varchar(50),  
   wins int, 
   losses int, 
   standing int, 
   primary key(mascot),
-  foreign key(home) references stadium(name)
+  foreign key(home_city, home_state) references stadium(city,state)
 );
 /* Attributes for player: id,name,team,height,weight,age,position,
  * jersey,birth_date,years_played,college
@@ -63,29 +66,26 @@ create table player (
   primary key(id),
   foreign key(team) references team(mascot)
 );
-/* Attributes for season: year,type,start_date,end_date
- * Primary key -> year and type
+/* Attributes for season: year,start_date,end_date
+ * Primary key -> year 
  * Foreign key -> none
 */
 create table season(
   year numeric(4, 0), 
-  type varchar(7), 
-    CHECK (type IN ('Regular', 'Post')),
   start_date date, 
   end_date date, 
-  primary key(year, type)
+  primary key(year)
 );
-/* Attributes for game: game_id,season_year,season_type,week,game_date,
+/* Attributes for game: game_id,season_year,week,game_date,
  * home_team,away_team,home_score,away_score
  * Primary key -> game_id
- * Foreign key -> season year and season type references seasons's year and type,
+ * Foreign key -> season year references seasons's year,
  *                home team references team's mascot,
  *				  away team references team's mascot
 */
 create table game(
   game_id varchar(12),
   season_year numeric(4, 0), 
-  season_type varchar(7),
   week varchar(9),
   game_date date, 
   home_team varchar(50), 
@@ -93,7 +93,7 @@ create table game(
   home_score int, 
   away_score int, 
   primary key(game_id),
-  foreign key(season_year, season_type) references season(year, type),
+  foreign key(season_year) references season(year),
   foreign key(home_team) references team(mascot), 
   foreign key(away_team) references team(mascot)
 );
